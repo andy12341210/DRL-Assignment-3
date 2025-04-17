@@ -16,7 +16,7 @@ class Agent(object):
         self.agent = DQNAgent(self.state_size,self.action_size)
 
         model_path = "dqn_agent.pth"
-        checkpoint = torch.load(model_path)
+        checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
         self.agent.policy_net.load_state_dict(checkpoint['policy_net'])
         self.agent.target_net.load_state_dict(checkpoint['target_net'])
 
