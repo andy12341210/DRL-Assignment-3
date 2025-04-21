@@ -4,5 +4,5 @@ env.py
 __pycache__
 run.py
 reward_shaping.py
-./model
-./picture
+model
+picture
