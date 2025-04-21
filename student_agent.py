@@ -1,9 +1,12 @@
 import gym
 from model import DQNAgent
+from collections import deque
 import gym_super_mario_bros
 from nes_py.wrappers import JoypadSpace
 from gym_super_mario_bros.actions import COMPLEX_MOVEMENT
 import torch
+import cv2
+import numpy as np
 from image_proccessing import FrameStack
 
 # Do not modify the input of the 'act' function and the '__init__' function. 
@@ -11,6 +14,7 @@ class Agent(object):
     def __init__(self):
         self.action_space = gym.spaces.Discrete(12)
         self.env = JoypadSpace(gym_super_mario_bros.make('SuperMarioBros-v0'),COMPLEX_MOVEMENT)
+        self.state_stack = deque(maxlen=4)
         self.state_size = self.env.observation_space.shape
         self.action_size = self.env.action_space.n
         self.agent = DQNAgent(self.state_size,self.action_size)
@@ -31,15 +35,28 @@ class Agent(object):
             return stacked
 
 
-    def act(self, observation):
-        if self._first:
-            state = self.fs.reset(observation)
-            self._first = False
-        else:
-            state = self.fs.step(observation)
+    def preprocess(self, observation):
+        # 示例預處理：調整大小、灰度化、歸一化
+        gray = cv2.cvtColor(observation, cv2.COLOR_RGB2GRAY)
+        resized = cv2.resize(gray, (84, 84))
+        normalized = resized / 255.0
+        return normalized
 
-        return self.agent.get_action(state,0.05)
+    def act(self, observation):
+        processed = self.preprocess(observation)
+        # 將當前幀加入緩衝區
+        if len(self.state_stack) < 4:
+            # 初始填充（假設第一幀重複）
+            for _ in range(4):
+                self.state_stack.append(processed)
+        else:
+            self.state_stack.append(processed)
+        # 堆疊4幀作為輸入
+        state = np.array(self.state_stack)  # Shape: (4, 84, 84)
+        state = torch.FloatTensor(state)  # 添加批次維度 -> [1,4,84,84]
+        return self.agent.get_action(state, epsilon=0.05)
     
+
     def step_env(self, action):
         try:
             next_obs, reward, done, info = self.env.step(action)
