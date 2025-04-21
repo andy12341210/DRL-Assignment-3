@@ -16,6 +16,7 @@ class Agent(object):
         self.agent = DQNAgent(self.state_size,self.action_size)
         self.fs = FrameStack(4)
         self.init = True
+        self._first = False
 
         model_path = "dqn_agent2.pth"
         checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
