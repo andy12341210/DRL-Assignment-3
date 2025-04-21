@@ -10,7 +10,7 @@ def preprocess(obs):
         gray = obs
     else:
         raise ValueError(f"Unexpected obs shape: {obs.shape}")
-    cropped = gray[... , :200]
+    cropped = gray[30: , :200]
     resized = cv2.resize(cropped, (84, 84))
     return resized.astype(np.uint8)
 

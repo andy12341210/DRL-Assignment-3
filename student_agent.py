@@ -8,7 +8,6 @@ from image_proccessing import FrameStack
 
 # Do not modify the input of the 'act' function and the '__init__' function. 
 class Agent(object):
-    """Agent that acts randomly."""
     def __init__(self):
         self.action_space = gym.spaces.Discrete(12)
         self.env = JoypadSpace(gym_super_mario_bros.make('SuperMarioBros-v0'),COMPLEX_MOVEMENT)
@@ -18,7 +17,7 @@ class Agent(object):
         self.fs = FrameStack(4)
         self.init = True
 
-        model_path = "dqn_agent.pth"
+        model_path = "dqn_agent2.pth"
         checkpoint = torch.load(model_path, map_location=torch.device('cpu'))
         self.agent.policy_net.load_state_dict(checkpoint['policy_net'])
         self.agent.target_net.load_state_dict(checkpoint['target_net'])
@@ -38,10 +37,21 @@ class Agent(object):
         else:
             state = self.fs.step(observation)
 
-        return self.agent.get_action(state,0)
+        return self.agent.get_action(state,0.05)
     
     def step_env(self, action):
-        next_obs, reward, done, info = self.env.step(action)
+        try:
+            next_obs, reward, done, info = self.env.step(action)
+        except ValueError:
+            # env.done 了，直接重設
+            next_obs = self.env.reset()[0]
+            # 把 FrameStack 也重設
+            self.fs.reset(next_obs)
+            self._first = False
+            # 這一步不算在前一個 episode 裡
+            reward, done, info = 0, False, {}
+            return next_obs, reward, done, info
+
         if done:
             self._first = True
         return next_obs, reward, done, info

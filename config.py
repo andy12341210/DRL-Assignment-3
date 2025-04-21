@@ -1,11 +1,10 @@
-epsilon_start = 0.9
-epsilon_end = 0.03
-epsilon_decay = 0.95
-num_episodes = 100
+epsilon_start = 0.5
+epsilon_end = 0.05
+epsilon_decay = 0.99
+num_episodes = 500
 gamma=0.99
-# lr=1e-3
 lr=1e-4
-buffer_capacity=1000000
+buffer_capacity=250000
 batch_size=32
 tau=1e-3
 
