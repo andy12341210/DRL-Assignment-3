@@ -1,12 +1,14 @@
-epsilon_start = 0.5
-epsilon_end = 0.05
-epsilon_decay = 0.99
-num_episodes = 500
+epsilon_start = 0.95
+epsilon_end = 0.01
+epsilon_decay = 0.9995
+num_episodes = 30000
 gamma=0.99
 lr=1e-4
-buffer_capacity=250000
-batch_size=32
+buffer_capacity=100000
+batch_size=64
 tau=1e-3
+steps = 3
+region = [[600,1400]]
 
 cfg = [  
             gamma,
@@ -18,4 +20,6 @@ cfg = [
             epsilon_start,
             epsilon_end,
             epsilon_decay,
+            steps,
+            region
 ]

@@ -6,3 +6,5 @@ run.py
 reward_shaping.py
 model
 picture
+config.py
+
